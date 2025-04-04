@@ -16,11 +16,12 @@ processor = LayoutLMv3Processor(feature_extractor, tokenizer)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Load the model from Hugging Face Hub
+import os
 model = LayoutLMv3ForSequenceClassification.from_pretrained(
     model_name,
-    token=""
+    token=os.getenv('HUGGINGFACE_TOKEN')  # Read the token from an environment variable
 )
+
 model.to(device)
 
 def classify_document(image_path):
