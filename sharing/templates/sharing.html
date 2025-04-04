@@ -1,0 +1,54 @@
+{% load static %}
+<!-- Modal Popup for Sharing -->
+<div class="modal-overlay" id="shareModal" style="display: none">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Share Document</h3>
+            <button class="modal-close" id="closeModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" id="userSearch" placeholder="Search users by name or email">
+        </div>
+        
+        <div class="selection-count" id="selectionCount">
+            <i class="fas fa-user-check"></i> <span id="selectedCount">0</span> users selected
+        </div>
+        
+        <div class="user-list" id="userList">
+            <!-- User items will be dynamically populated here -->
+        </div>
+        
+        <div class="permission-section">
+            <div class="section-title">Permission Level</div>
+            <div class="permission-options">
+                <div class="permission-option selected" data-permission="view">
+                    <div class="permission-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="permission-label">View Only</div>
+                </div>
+                
+                <div class="permission-option" data-permission="edit">
+                    <div class="permission-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="permission-label">Edit</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelShare">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="btn btn-primary" id="confirmShare">
+                <i class="fas fa-share-alt"></i> Share
+            </button>
+        </div>
+    </div>
+</div>
+

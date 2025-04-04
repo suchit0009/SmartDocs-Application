@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartDocs - Intelligent Document Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-dark: #3730a3;
+            --secondary: #0f172a;
+            --secondary-light: #1e293b;
+            --light: #f8fafc;
+            --accent: #22d3ee;
+            --warning: #fbbf24;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --success: #38b000;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-800: #343a40;
+            --dark: #212529;
+            --purple-hover: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar.scrolled {
+            padding: 0.7rem 0;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            margin-right: 8px;
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray-800);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-cta {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-cta:hover {
+            background-color: var(--primary-dark);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .mobile-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 150px 0 100px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .hero-heading {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .hero-subheading {
+            font-size: 1.5rem;
+            color: var(--gray-800);
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-paragraph {
+            font-size: 1.1rem;
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-image {
+            flex: 1;
+            position: relative;
+            animation: floatImage 4s ease-in-out infinite;
+            transform: scale(1.15);
+            transform-origin: center;
+            max-width: 800px;
+            max-height: 500px;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 20px 30px rgba(67, 97, 238, 0.15);
+        }
+        
+        .hero-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(67, 97, 238, 0.05);
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            right: 10%;
+            animation: floatShape 8s ease-in-out infinite;
+        }
+        
+        .shape-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            left: 5%;
+            animation: floatShape 6s ease-in-out infinite 1s;
+        }
+        
+        /* CTA Button */
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .cta-primary {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .cta-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        .cta-secondary {
+            display: inline-flex;
+            align-items: center;
+            background-color: transparent;
+            color: var(--primary);
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary);
+        }
+        
+        .cta-secondary:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+            transform: translateY(-3px);
+        }
+        
+        .cta-icon {
+            margin-left: 8px;
+        }
+        
+        /* Trusted By Section */
+        .trusted-by {
+            padding: 60px 0;
+            background-color: white;
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+        
+        .brands {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5rem;
+        }
+        
+        .brand {
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            animation: fadeIn 1s ease-out;
+            width: 120px;
+        }
+        
+        .brand:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .brand img {
+            width: 125%;
+            height: auto;
+            object-fit: contain;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background-color: var(--gray-100);
+        }
+        
+        .features-heading {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 70px;
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-icon {
+            background-color: var(--primary);
+            color: white;
+            transform: rotateY(180deg);
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .feature-description {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-link:hover {
+            color: var(--primary-dark);
+        }
+        
+        .feature-link-icon {
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-link:hover .feature-link-icon {
+            transform: translateX(5px);
+        }
+        
+        /* Testimonials Section */
+        .testimonials {
+            padding: 100px 0;
+            background-color: white;
+        }
+        
+        .testimonials-heading {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .testimonials-container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .testimonial-wrapper {
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .testimonials-track {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        
+        .testimonial {
+            min-width: 100%;
+            padding: 2rem;
+            background-color: var(--gray-100);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+        
+        .testimonial-content {
+            position: relative;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .testimonial-content::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 30px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            transform: rotate(45deg);
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .testimonial-client {
+            display: flex;
+            align-items: center;
+        }
+        
+        .client-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 1rem;
+        }
+        
+        .client-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .client-info h4 {
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+        
+        .client-info p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .testimonial-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+        
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            border: 1px solid var(--gray-300);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .control-btn:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .testimonial-indicators {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+            gap: 0.5rem;
+        }
+        
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--gray-300);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .indicator.active {
+            background-color: var(--primary);
+            width: 30px;
+            border-radius: 5px;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 100px 0;
+            background-color: var(--gray-100);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--purple-hover);
+        }
+
+        .pricing-header {
+            margin-bottom: 2rem;
+        }
+
+        .pricing-header h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover .price {
+            color: var(--purple-hover);
+            background: linear-gradient(to right, var(--purple-hover), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .price span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #6c757d;
+            font-family: 'Poppins', sans-serif;
+            background: none;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            margin-bottom: 1rem;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+        }
+
+        .pricing-features li i {
+            color: var(--success);
+            margin-right: 10px;
+        }
+
+        .pricing-btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .pricing-btn:hover {
+            background-color: var(--purple-hover);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive adjustments for pricing */
+        @media (max-width: 992px) {
+            .pricing-grid {
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pricing-card {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-card {
+                max-width: 350px;
+                margin: 0 auto;
+            }
+        }
+        
+        /* Call to Action Section */
+        .cta-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta-description {
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+        
+        .cta-btn {
+            display: inline-block;
+            background-color: white;
+            color: var(--primary);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Enquiry Form Section */
+        .enquiry-section {
+            padding: 100px 0;
+            background-color: var(--light);
+        }
+        
+        .enquiry-container {
+            display: flex;
+            align-items: stretch;
+            gap: 3rem;
+        }
+        
+        .enquiry-content {
+            flex: 1;
+        }
+        
+        .enquiry-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .enquiry-description {
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+        
+        .enquiry-info {
+            margin-bottom: 2rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-icon {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-right: 1rem;
+            margin-top: 3px;
+        }
+        
+        .info-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        
+        .info-content p {
+            color: #6c757d;
+        }
+        
+        .enquiry-form {
+            flex: 1;
+            background-color: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .form-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 80px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-logo-icon {
+            margin-right: 8px;
+            font-size: 1.8rem;
+        }
+        
+        .footer-description {
+            color: #adb5bd;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .social-link:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .footer-heading {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-link {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-link a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-link a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+        
+        .footer-subscribe {
+            display: flex;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-input {
+            flex: 1;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 0.8rem 1rem;
+            color: white;
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .footer-input:focus {
+            outline: none;
+        }
+        
+        .footer-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .footer-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .footer-copyright {
+            color: #adb5bd;
+            font-size: 0.9rem;
+        }
+        
+        .footer-policy {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .footer-policy a {
+            color: #adb5bd;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-policy a:hover {
+            color: white;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 0.6;
+            }
+        }
+        
+        @keyframes floatImage {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes floatShape {
+            0% {
+                transform: translate(0, 0);
+            }
+            50% {
+                transform: translate(15px, 15px);
+            }
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-text {
+                max-width: 100%;
+            }
+            
+            .hero-heading {
+                font-size: 3rem;
+            }
+            
+            .cta-buttons {
+                justify-content: center;
+            }
+            
+            .enquiry-container {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                padding: 1rem 0;
+                background-color: white;
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-links li {
+                margin: 0.5rem 0;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .hero-heading {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-heading {
+                font-size: 2rem;
+            }
+            
+            .hero-subheading {
+                font-size: 1.2rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+            
+            .feature-card {
+                padding: 1.5rem;
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-policy {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-file-alt logo-icon"></i>
+                SmartDocs
+            </a>
+            
+            <div class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="{% url 'login' %}" class="nav-cta" style="color: white;">Get Started</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1 class="hero-heading">Smart Document Management for Modern Teams</h1>
+                <h2 class="hero-subheading">Organize, Collaborate, Simplify.</h2>
+                <p class="hero-paragraph">SmartDocs helps teams manage, organize, and collaborate on documents with AI-powered features that streamline your workflow and boost productivity.</p>
+                
+                <div class="cta-buttons">
+                    <a href="{% url 'login' %}" class="cta-primary">Start Free Trial</a>
+                    <a href="#" class="cta-secondary">
+                        Watch Demo <i class="fas fa-play-circle cta-icon"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-image">
+                <img src="static/images/smartdocs dashboard.png" alt="SmartDocs Dashboard">
+            </div>
+        </div>
+        
+        <div class="hero-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+        </div>
+    </section>
+    
+    <!-- Trusted By Section -->
+    <section class="trusted-by">
+        <div class="container">
+            <h2 class="section-title">Trusted by Industry Leaders</h2>
+            <p class="section-subtitle">Join thousands of teams worldwide who trust SmartDocs for their document management needs</p>
+            
+            <div class="brands">
+                <div class="brand">
+                    <img src="static/images/Islinton College.png" alt="Islinton College">
+                </div>
+                <div class="brand">
+                    <img src="static/images/ING Group.png" alt="ING Group">
+                </div>
+                <div class="brand">
+                    <img src="static/images/London Metropolitan University Logo.png" alt="London Metropoliton University">
+                </div>
+                <div class="brand">
+                    <img src="static/images/Danson Solutions.png" alt="Danson Solution">
+                </div>
+                <div class="brand">
+                    <img src="static/images/CloudFactory.png" alt="CloudFactory">
+                </div>
+                <div class="brand">
+                    <img src="static/images/Sainju Dairy.jpeg" alt="Sainju Dairy">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="features-heading">
+                <h2 class="section-title">Powerful Features to Streamline Your Workflow</h2>
+                <p class="section-subtitle">Advanced tools designed to organize your documents and enhance team collaboration</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="feature-title">Smart Search</h3>
+                    <p class="feature-description">Find any document in seconds with our search engine that understands context and meaning.</p>
+                    <a href="#" class="feature-link">
+                        Learn more <i class="fas fa-arrow-right feature-link-icon"></i>
+                    </a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="feature-title">Advanced Security</h3>
+                    <p class="feature-description">Keep your sensitive documents safe with customizable access controls.</p>
+                    <a href="#" class="feature-link">
+                        Learn more <i class="fas fa-arrow-right feature-link-icon"></i>
+                    </a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="feature-title">Real-time Collaboration</h3>
+                    <p class="feature-description">Work together with your team through real-time editing and version control.</p>
+                    <a href="#" class="feature-link">
+                        Learn more <i class="fas fa-arrow-right feature-link-icon"></i>
+                    </a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 class="feature-title">AI Document Analysis</h3>
+                    <p class="feature-description">Extract insights automatically with our AI that can help you analyze document content.</p>
+                    <a href="#" class="feature-link">
+                        Learn more <i class="fas fa-arrow-right feature-link-icon"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="testimonials-heading">
+                <h2 class="section-title">What Our Customers Say</h2>
+                <p class="section-subtitle">Hear from companies that have transformed their document management with SmartDocs</p>
+            </div>
+            
+            <div class="testimonials-container">
+                <div class="testimonial-wrapper">
+                    <div class="testimonials-track" id="testimonialsTrack">
+                        <div class="testimonial">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text">"SmartDocs has completely changed how our team handles documentation. The AI-powered search has saved us countless hours, and the collaboration features ensure everyone stays on the same page."</p>
+                            </div>
+                            <div class="testimonial-client">
+                                <div class="client-image">
+                                    <img src="/static/images/Flux Lora.jpeg" alt="Sarah Johnson">
+                                </div>
+                                <div class="client-info">
+                                    <h4>Sarah Johnson</h4>
+                                    <p>Academic Head at London Metropolitan University</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="testimonial">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text">"The security features of SmartDocs give us peace of mind when handling sensitive client information. It's intuitive, powerful, and has become an essential part of our daily operations."</p>
+                            </div>
+                            <div class="testimonial-client">
+                                <div class="client-image">
+                                    <img src="/static/images/Suchit Avatar.jpg" alt="CEO at ING Group">
+                                </div>
+                                <div class="client-info">
+                                    <h4>Sulav Budhathoki</h4>
+                                    <p>CEO at ING Group</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="testimonial">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text"><h3><b>Huge time savings in parsing utility bills!</b></h3><br>
+                                    “I like that Docsumo is comprehensive regarding both the developer experience and the user experience. The automation results are reliable. With Docsumo, the team efforts are down to either fully automatic parsing or only a few minutes per customer.”</p>
+                            </div>
+                            <div class="testimonial-client">
+                                <div class="client-image">
+                                    <img src="static/images/Operation Head.jpg" alt="Project Manager at Dason Solution">
+                                </div>
+                                <div class="client-info">
+                                    <h4>Shreya Shrestha</h4>
+                                    <p>Project Manager at Danson Solutions</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-controls">
+                    <button class="control-btn" id="prevBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="control-btn" id="nextBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="testimonial-indicators">
+                    <div class="indicator active" data-index="0"></div>
+                    <div class="indicator" data-index="1"></div>
+                    <div class="indicator" data-index="2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-heading">
+                <h2 class="section-title">Simple, Transparent Pricing</h2>
+                <p class="section-subtitle">Choose the plan that best fits your team's needs</p>
+            </div>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Free</h3>
+                        <div class="price">$0<span>/month</span></div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Up to 5 users</li>
+                        <li><i class="fas fa-check"></i> 5GB storage</li>
+                        <li><i class="fas fa-check"></i> Basic search</li>
+                        <li><i class="fas fa-check"></i> Basic security</li>
+                    </ul>
+                    <a href="{% url 'login' %}" class="pricing-btn">Get Started</a>
+                </div>
+                
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Professional</h3>
+                        <div class="price">$19<span>/month per user</span></div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Unlimited users</li>
+                        <li><i class="fas fa-check"></i> 250GB storage</li>
+                        <li><i class="fas fa-check"></i> AI-powered search</li>
+                        <li><i class="fas fa-check"></i> Advanced security</li>
+                        <li><i class="fas fa-check"></i> Priority support</li>
+                    </ul>
+                    <a href="{% url 'login' %}" class="pricing-btn">Get Started</a>
+                </div>
+                
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Enterprise</h3>
+                        <div class="price">$39<span>/month per user</span></div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Unlimited users</li>
+                        <li><i class="fas fa-check"></i> Unlimited storage</li>
+                        <li><i class="fas fa-check"></i> Advanced AI features</li>
+                        <li><i class="fas fa-check"></i> Enterprise security</li>
+                        <li><i class="fas fa-check"></i> 24/7 dedicated support</li>
+                        <li><i class="fas fa-check"></i> Custom integrations</li>
+                    </ul>
+                    <a href="{% url 'login' %}" class="pricing-btn">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Call to Action Section -->
+    <section class="cta-section">
+        <div class="container cta-container">
+            <h2 class="cta-title">Ready to Transform Your Document Management?</h2>
+            <p class="cta-description">Join thousands of satisfied teams who have streamlined their workflow with SmartDocs.</p>
+            <a href="{% url 'login' %}" class="cta-btn">Start Your Free 14-Day Trial</a>
+        </div>
+    </section>
+    
+    <!-- Enquiry Form Section -->
+    <section class="enquiry-section" id="contact">
+        <div class="container enquiry-container">
+            <div class="enquiry-content">
+                <h2 class="enquiry-title">Get in Touch</h2>
+                <p class="enquiry-description">Have questions about SmartDocs? Our team is here to help. Fill out the form and we'll get back to you as soon as possible.</p>
+                
+                <div class="enquiry-info">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Email Us</h4>
+                            <p>info@smartdocs.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Call Us</h4>
+                            <p>+977-9840140317</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Visit Us</h4>
+                            <p>Kamal Marg, Kathmandu Nepal</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="enquiry-form">
+                <form>
+                    <div class="form-group">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" id="name" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" id="email" class="form-control" placeholder="Enter your email address" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="company" class="form-label">Company Name</label>
+                        <input type="text" id="company" class="form-control" placeholder="Enter your company name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message" class="form-label">Your Message</label>
+                        <textarea id="message" class="form-control" placeholder="How can we help you?" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="form-btn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <a href="#" class="footer-logo">
+                        <i class="fas fa-file-alt footer-logo-icon"></i>
+                        SmartDocs
+                    </a>
+                    <p class="footer-description">Intelligent document management solutions for modern teams. Organize, collaborate, and simplify your workflow.</p>
+                    
+                    <div class="footer-social">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="footer-heading">Quick Links</h3>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#">Home</a></li>
+                        <li class="footer-link"><a href="#features">Features</a></li>
+                        <li class="footer-link"><a href="#testimonials">Testimonials</a></li>
+                        <li class="footer-link"><a href="#pricing">Pricing</a></li>
+                        <li class="footer-link"><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="footer-heading">Product</h3>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#">Smart Search</a></li>
+                        <li class="footer-link"><a href="#">Document Security</a></li>
+                        <li class="footer-link"><a href="#">Collaboration Tools</a></li>
+                        <li class="footer-link"><a href="#">AI Features</a></li>
+                        <li class="footer-link"><a href="#">Integrations</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="footer-heading">Subscribe</h3>
+                    <p class="footer-description">Stay updated with our latest features and releases.</p>
+                    
+                    <div class="footer-subscribe">
+                        <input type="email" class="footer-input" placeholder="Enter your email">
+                        <button class="footer-btn"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-divider"></div>
+            
+            <div class="footer-bottom">
+                <p class="footer-copyright">© 2025 SmartDocs. All rights reserved.</p>
+                
+                <div class="footer-policy">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script>
+        // Navigation Toggle
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        mobileToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        
+        // Testimonial Slider
+        const track = document.getElementById('testimonialsTrack');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const indicators = document.querySelectorAll('.indicator');
+        
+        let currentIndex = 0;
+        
+        function updateSlider() {
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
+            
+            indicators.forEach((indicator, index) => {
+                if (index === currentIndex) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+        }
+        
+        prevBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + 3) % 3;
+            updateSlider();
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % 3;
+            updateSlider();
+        });
+        
+        indicators.forEach(indicator => {
+            indicator.addEventListener('click', () => {
+                currentIndex = parseInt(indicator.getAttribute('data-index'));
+                updateSlider();
+            });
+        });
+        
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % 3;
+            updateSlider();
+        }, 5000);
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (this.getAttribute('href') === '#') return;
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    navLinks.classList.remove('active');
+                }
+            });
+        });
+        
+        // Animation on scroll
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.feature-card, .section-title, .section-subtitle, .testimonial, .cta-title, .cta-description, .cta-btn, .enquiry-content, .enquiry-form');
+            
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight;
+                
+                if (elementPosition < screenPosition - 100) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        }
+        
+        document.querySelectorAll('.feature-card, .section-title, .section-subtitle, .testimonial, .cta-title, .cta-description, .cta-btn, .enquiry-content, .enquiry-form').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'all 0.6s ease-out';
+        });
+        
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+    </script>
+</body>
+</html>

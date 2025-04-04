@@ -1,0 +1,2397 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartDocs - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/upload.css' %}">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-dark: #3730a3;
+            --secondary: #0f172a;
+            --secondary-light: #1e293b;
+            --light: #f8fafc;
+            --accent: #22d3ee;
+            --warning: #fbbf24;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --success: #38b000;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-800: #343a40;
+            --dark: #212529;
+            --border-radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--gray-100);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: auto;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        .dashboard {
+            display: flex;
+            height: 100vh;
+            background-color: #f1f5f9;
+            position: relative;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            color: var(--light);
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 25px;
+            letter-spacing: 0.5px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin: 12px 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-info {
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--light);
+        }
+
+        .section-title {
+            padding: 0 24px;
+            margin: 10px 0;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            padding: 0 12px;
+            list-style: none;
+            gap: 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            margin: 4px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+        }
+
+        .nav-text-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            margin-right: 12px;
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .nav-text {
+            color: var(--text-primary);
+        }
+
+        .document-count {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: url('{% static "images/subtle-pattern.png" %}') repeat, var(--gray-100);
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            max-width: 300px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid var(--gray-300);
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            background: linear-gradient(145deg, white, #f0f4ff);
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(79, 70, 229, 0.2);
+            background: white;
+        }
+
+        .search-bar::after {
+            content: '\f002';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-800);
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+
+        .upload-btn:hover {
+            background: linear-gradient(45deg, var(--primary-dark), var(--secondary-light));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(67, 97, 238, 0.4);
+        }
+
+        .upload-btn i {
+            margin-right: 10px;
+        }
+
+        .logout-btn {
+            background: linear-gradient(45deg, var(--light), #e2e8f0);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(45deg, #fff0f0, #ffe5e5);
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            padding: 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .content-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: var(--light);
+        }
+
+        .section-title i {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .section-title h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .document-card small {
+            display: block;
+            color: var(--gray-800);
+            font-size: 12px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: var(--gray-100);
+            color: var(--primary);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid var(--gray-200);
+            position: relative;
+        }
+
+        th a {
+            color: var(--primary);
+            text-decoration: none;
+            margin-left: 5px;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        th a:hover {
+            color: var(--primary-dark);
+        }
+
+        th a svg {
+            width: 12px;
+            height: 12px;
+            margin-left: 5px;
+            fill: var(--primary);
+            transition: fill 0.3s ease, transform 0.3s ease;
+        }
+
+        th a:hover svg {
+            fill: var(--primary-dark);
+            transform: scale(1.2);
+        }
+
+        .sort-asc svg {
+            transform: rotate(180deg);
+        }
+
+        tr {
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        td {
+            padding: 12px;
+            color: var(--dark);
+            font-size: 14px;
+            vertical-align: middle;
+            transition: background-color 0.2s ease;
+        }
+
+        tr:last-child {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: rgba(79, 70, 229, 0.05);
+        }
+
+        @keyframes rowFadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 4px 0;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #dc3545;
+            padding: 6px;
+            border-radius: 6px;
+            transition: color 0.3s ease, transform 0.2s ease, background-color 0.3s ease;
+            outline: none;
+        }
+
+        .delete-btn:hover {
+            color: #c82333;
+            transform: scale(1.2);
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .delete-btn:disabled {
+            color: #dc3545;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .edit-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #28a745;
+            padding: 6px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: color 0.3s ease, transform 0.2s ease, background-color 0.3s ease;
+            outline: none;
+        }
+
+        .edit-btn:hover {
+            color: #218838;
+            transform: scale(1.2);
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+
+        .delete-btn i,
+        .edit-btn i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+
+        .delete-btn[title],
+        .edit-btn[title] {
+            position: relative;
+        }
+
+        .delete-btn[title]:hover::after,
+        .edit-btn[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .delete-btn[title]:hover::after,
+        .edit-btn[title]:hover::after {
+            opacity: 1;
+        }
+
+        td:first-child {
+            padding-left: 15px;
+        }
+
+        .document-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .document-card {
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 145px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .document-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.1);
+            border-color: var(--primary-dark);
+            border-width: 2px;
+        }
+
+        .document-card i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .document-card p {
+            color: var(--dark);
+            font-weight: 500;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            font-size: 0.8rem;
+        }
+
+        .pagination a, .pagination span {
+            padding: 6px 10px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            color: var(--primary);
+            background: var(--gray-100);
+            transition: background-color 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background: var(--gray-200);
+        }
+
+        .pagination span {
+            background: var(--primary);
+            color: var(--light);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .document-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+
+            .section-title h2 {
+                font-size: 1.2rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .search-bar {
+                max-width: 100%;
+            }
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 25px;
+            position: relative;
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--gray-800);
+        }
+
+        .close:hover {
+            color: var(--primary);
+        }
+
+        .file-upload-container {
+            border: 2px dashed var(--gray-300);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            background-color: var(--gray-100);
+        }
+
+        .file-upload-container.dragover {
+            background-color: rgba(67, 97, 238, 0.1);
+            border-color: var(--primary);
+        }
+
+        .file-upload-container p {
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        #browseFilesBtn {
+            background: linear-gradient(45deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        #browseFilesBtn:hover {
+            background: linear-gradient(45deg, var(--primary-dark) 0%, var(--secondary) 100%);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-list {
+            margin-bottom: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: var(--gray-100);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .cancel-btn {
+            background: none;
+            border: none;
+            color: var(--gray-800);
+            cursor: pointer;
+        }
+
+        .cancel-btn:hover {
+            color: #dc3545;
+        }
+
+        .upload-progress {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: var(--gray-200);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .btn-secondary {
+            background-color: var(--gray-200);
+            color: var(--gray-800);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--gray-300);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary) 0%, var(--secondary) 60%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, var(--primary-dark) 0%, var(--secondary) 100%);
+            box-shadow: 0 4px 8px rgba(114, 9, 183, 0.3);
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .message-close {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--gray-800);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .message-close:hover {
+            color: #dc3545;
+        }
+
+        .success-message {
+            background-color: rgba(56, 176, 0, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .error-message {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: rotate 1.2s linear infinite;
+        }
+
+        .loader span {
+            position: absolute;
+            width: 6px;
+            height: 16px;
+            background: var(--primary);
+            border-radius: 3px;
+            transform-origin: center 30px;
+        }
+
+        .loader span:nth-child(1) { transform: rotate(0deg); animation: fade 1.2s linear infinite; }
+        .loader span:nth-child(2) { transform: rotate(30deg); animation: fade 1.2s linear infinite 0.1s; }
+        .loader span:nth-child(3) { transform: rotate(60deg); animation: fade 1.2s linear infinite 0.2s; }
+        .loader span:nth-child(4) { transform: rotate(90deg); animation: fade 1.2s linear infinite 0.3s; }
+        .loader span:nth-child(5) { transform: rotate(120deg); animation: fade 1.2s linear infinite 0.4s; }
+        .loader span:nth-child(6) { transform: rotate(150deg); animation: fade 1.2s linear infinite 0.5s; }
+        .loader span:nth-child(7) { transform: rotate(180deg); animation: fade 1.2s linear infinite 0.6s; }
+        .loader span:nth-child(8) { transform: rotate(210deg); animation: fade 1.2s linear infinite 0.7s; }
+        .loader span:nth-child(9) { transform: rotate(240deg); animation: fade 1.2s linear infinite 0.8s; }
+        .loader span:nth-child(10) { transform: rotate(270deg); animation: fade 1.2s linear infinite 0.9s; }
+        .loader span:nth-child(11) { transform: rotate(300deg); animation: fade 1.2s linear infinite 1s; }
+        .loader span:nth-child(12) { transform: rotate(330deg); animation: fade 1.2s linear infinite 1.1s; }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fade {
+            0% { opacity: 1; background: var(--primary); }
+            50% { opacity: 0.3; background: var(--primary-light); }
+            100% { opacity: 1; background: var(--primary); }
+        }
+
+        .delete-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .delete-modal-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 500px;
+            padding: 25px;
+            position: relative;
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+
+        .delete-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 15px;
+        }
+
+        .delete-modal-header h2 {
+            margin: 0;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .delete-modal-header h2.shared {
+            color: #dc3545;
+        }
+
+        .delete-modal-header h2.not-shared {
+            color: var(--primary);
+        }
+
+        .delete-modal-content p {
+            color: var(--gray-800);
+            margin-bottom: 20px;
+        }
+
+        .delete-modal-content p.shared {
+            color: #dc3545;
+        }
+
+        .delete-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-cancel {
+            background-color: var(--gray-200);
+            color: var(--gray-800);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background-color: var(--gray-300);
+        }
+
+        .btn-delete {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background: linear-gradient(45deg, #c82333, #b31b2b);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-delete.not-shared {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+        }
+
+        .btn-delete.not-shared:hover {
+            background: linear-gradient(45deg, var(--primary-dark), var(--secondary));
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="{% url 'home' %}" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <span class="logo-text">SmartDocs</span>
+                </a>
+            </div>
+            
+            <div class="user-profile">
+                <div class="avatar">
+                    {{ request.user.username|slice:":2"|upper }}
+                </div>
+                <div class="user-info">
+                    <div class="user-name"><b>{{ request.user.username }}</b></div>
+                    {% if request.user.email %}
+                        <div class="user-email">{{ request.user.email }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="section-title">Document Categories</div>
+            <ul class="nav-list">
+                <li class="nav-item active" data-section="documents" onclick="selectSection(this)">
+                    <div class="nav-text-group">
+                        <div class="nav-icon"><i class="fas fa-file"></i></div>
+                        <div class="nav-text">My Documents</div>
+                    </div>
+                    <div class="document-count">{{ total_documents }}</div>
+                </li>
+                <li class="nav-item" data-section="license" onclick="selectSection(this)">
+                    <div class="nav-text-group">
+                        <div class="nav-icon"><i class="fas fa-id-card"></i></div>
+                        <div class="nav-text">License</div>
+                    </div>
+                    <div class="document-count">{{ license_count }}</div>
+                </li>
+                <li class="nav-item" data-section="passport" onclick="selectSection(this)">
+                    <div class="nav-text-group">
+                        <div class="nav-icon"><i class="fas fa-passport"></i></div>
+                        <div class="nav-text">Passport</div>
+                    </div>
+                    <div class="document-count">{{ passport_count }}</div>
+                </li>
+                <li class="nav-item" data-section="invoices" onclick="selectSection(this)">
+                    <div class="nav-text-group">
+                        <div class="nav-icon"><i class="fas fa-file-invoice"></i></div>
+                        <div class="nav-text">Invoices</div>
+                    </div>
+                    <div class="document-count">{{ invoice_count }}</div>
+                </li>
+                <li class="nav-item" data-section="checks" onclick="selectSection(this)">
+                    <div class="nav-text-group">
+                        <div class="nav-icon"><i class="fas fa-money-check-alt"></i></div>
+                        <div class="nav-text">Checks</div>
+                    </div>
+                    <div class="document-count">{{ check_count }}</div>
+                </li>
+                <li class="nav-item" data-section="resume" onclick="selectSection(this)">
+                    <div class="nav-text-group">
+                        <div class="nav-icon"><i class="fas fa-file-alt"></i></div>
+                        <div class="nav-text">Resume</div>
+                    </div>
+                    <div class="document-count">{{ resume_count }}</div>
+                </li>
+                <li class="nav-item" data-section="shared-documents" onclick="selectSection(this)">
+                    <div class="nav-text-group">
+                        <div class="nav-icon"><i class="fas fa-share-alt"></i></div>
+                        <div class="nav-text">Shared Documents</div>
+                    </div>
+                    <div class="document-count">{{ shared_count }}</div>
+                </li>
+            </ul>
+            
+            <div class="section-title">Settings</div>
+            <ul class="nav-list">
+                <li class="nav-item" data-section="settings" onclick="selectSection(this)">
+                    <div class="nav-text-group">
+                        <div class="nav-icon"><i class="fas fa-cog"></i></div>
+                        <div class="nav-text">Settings</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <main>
+            <div class="header">
+                <button class="upload-btn" onclick="openUploadModal()">
+                    <i class="fas fa-file-upload"></i> Upload Document
+                </button>
+                <div class="search-bar">
+                    <form method="get" action="">
+                        <input type="text" name="search" placeholder="Search by title..." value="{{ search_query }}">
+                    </form>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+
+            <!-- Section to display upload messages -->
+            <div id="uploadMessages" class="messages"></div>
+
+            <!-- Documents Section -->
+            <section id="documents" class="content-section active">
+                <div class="section-title">
+                    <i class="fas fa-file"></i>
+                    <h2>Latest Documents</h2>
+                </div>
+                <div class="document-grid">
+                    {% for doc in latest_documents %}
+                    <div class="document-card" data-doc-id="{{ doc.id }}" onclick="viewDocument('{{ doc.id }}')">
+                        <i class="fas fa-file"></i>
+                        <p>{{ doc.title }}</p>
+                    </div>
+                    {% empty %}
+                    <p>No documents uploaded yet.</p>
+                    {% endfor %}
+                </div>
+                <div class="table-container">
+                    <h2>All Documents</h2>
+                    {% if search_query %}
+                        {% if all_documents_page %}
+                            <p style="color: var(--success); margin-bottom: 15px;">Document found for "{{ search_query }}"</p>
+                        {% else %}
+                            <p style="color: var(--warning); margin-bottom: 15px;">No document found for "{{ search_query }}"</p>
+                        {% endif %}
+                    {% endif %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="action-column"></th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>
+                                    Size
+                                    <a href="?sort=file_size&order={% if sort == 'file_size' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'file_size' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>
+                                    Uploaded At
+                                    <a href="?sort=uploaded_at&order={% if sort == 'uploaded_at' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'uploaded_at' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in all_documents_page %}
+                            <tr data-doc-id="{{ doc.id }}" data-category="{{ doc.category }}">
+                                <td class="action-buttons">
+                                    <button class="delete-btn" title="Delete" data-doc-id="{{ doc.id }}" data-doc-title="{{ doc.title|escapejs }}" data-doc-category="{{ doc.category }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <a href="{% url 'documents:edit_document' doc.id %}" class="edit-btn" title="Edit" onclick="event.stopPropagation();">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                </td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.title }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_type|default:"Unknown" }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_size|filesizeformat }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.get_category_display }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')"><span class="badge badge-review">Review</span></td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.uploaded_at }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7">No documents uploaded yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        {% if all_documents_page.has_previous %}
+                            <a href="?page={{ all_documents_page.previous_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="prev">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        {% for num in all_documents_page.paginator.page_range %}
+                            {% if num == all_documents_page.number %}
+                                <span>{{ num }}</span>
+                            {% else %}
+                                <a href="?page={{ num }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if all_documents_page.has_next %}
+                            <a href="?page={{ all_documents_page.next_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="next">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- License Section -->
+            <section id="license" class="content-section">
+                <div class="section-title">
+                    <i class="fas fa-id-card"></i>
+                    <h2>Latest License Documents</h2>
+                </div>
+                <div class="document-grid">
+                    {% for doc in latest_license_docs %}
+                    <div class="document-card" data-doc-id="{{ doc.id }}" onclick="viewDocument('{{ doc.id }}')">
+                        <i class="fas fa-id-card"></i>
+                        <p>{{ doc.title }}</p>
+                    </div>
+                    {% empty %}
+                    <p>No license documents uploaded yet.</p>
+                    {% endfor %}
+                </div>
+                <div class="table-container">
+                    <h2>All License Documents</h2>
+                    {% if search_query %}
+                        {% if license_docs %}
+                            <p style="color: var(--success); margin-bottom: 15px;">Document found for "{{ search_query }}"</p>
+                        {% else %}
+                            <p style="color: var(--warning); margin-bottom: 15px;">No document found for "{{ search_query }}"</p>
+                        {% endif %}
+                    {% endif %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>
+                                    Size
+                                    <a href="?sort=file_size&order={% if sort == 'file_size' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'file_size' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>
+                                    Uploaded At
+                                    <a href="?sort=uploaded_at&order={% if sort == 'uploaded_at' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'uploaded_at' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in license_docs %}
+                            <tr data-doc-id="{{ doc.id }}" data-category="{{ doc.category }}">
+                                <td class="action-buttons">
+                                    <button class="delete-btn" title="Delete" data-doc-id="{{ doc.id }}" data-doc-title="{{ doc.title|escapejs }}" data-doc-category="{{ doc.category }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <a href="{% url 'documents:edit_document' doc.id %}" class="edit-btn" title="Edit" onclick="event.stopPropagation();">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                </td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.title }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_type|default:"Unknown" }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_size|filesizeformat }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.get_category_display }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')"><span class="badge badge-review">Review</span></td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.uploaded_at }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7">No license documents uploaded yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        {% if license_docs.has_previous %}
+                            <a href="?page={{ license_docs.previous_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="prev">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        {% for num in license_docs.paginator.page_range %}
+                            {% if num == license_docs.number %}
+                                <span>{{ num }}</span>
+                            {% else %}
+                                <a href="?page={{ num }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if license_docs.has_next %}
+                            <a href="?page={{ license_docs.next_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="next">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Passport Section -->
+            <section id="passport" class="content-section">
+                <div class="section-title">
+                    <i class="fas fa-passport"></i>
+                    <h2>Latest Passports</h2>
+                </div>
+                <div class="document-grid">
+                    {% for doc in latest_passport_docs %}
+                    <div class="document-card" data-doc-id="{{ doc.id }}" onclick="viewDocument('{{ doc.id }}')">
+                        <i class="fas fa-passport"></i>
+                        <p>{{ doc.title }}</p>
+                    </div>
+                    {% empty %}
+                    <p>No passports uploaded yet.</p>
+                    {% endfor %}
+                </div>
+                <div class="table-container">
+                    <h2>All Passports</h2>
+                    {% if search_query %}
+                        {% if passport_docs %}
+                            <p style="color: var(--success); margin-bottom: 15px;">Document found for "{{ search_query }}"</p>
+                        {% else %}
+                            <p style="color: var(--warning); margin-bottom: 15px;">No document found for "{{ search_query }}"</p>
+                        {% endif %}
+                    {% endif %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>
+                                    Size
+                                    <a href="?sort=file_size&order={% if sort == 'file_size' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'file_size' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>
+                                    Uploaded At
+                                    <a href="?sort=uploaded_at&order={% if sort == 'uploaded_at' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'uploaded_at' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in passport_docs %}
+                            <tr data-doc-id="{{ doc.id }}" data-category="{{ doc.category }}">
+                                <td class="action-buttons">
+                                    <button class="delete-btn" title="Delete" data-doc-id="{{ doc.id }}" data-doc-title="{{ doc.title|escapejs }}" data-doc-category="{{ doc.category }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <a href="{% url 'documents:edit_document' doc.id %}" class="edit-btn" title="Edit" onclick="event.stopPropagation();">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                </td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.title }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_type }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_size|filesizeformat }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.get_category_display }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')"><span class="badge badge-review">Review</span></td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.uploaded_at }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7">No passports uploaded yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        {% if passport_docs.has_previous %}
+                            <a href="?page={{ passport_docs.previous_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="prev">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        {% for num in passport_docs.paginator.page_range %}
+                            {% if num == passport_docs.number %}
+                                <span>{{ num }}</span>
+                            {% else %}
+                                <a href="?page={{ num }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if passport_docs.has_next %}
+                            <a href="?page={{ passport_docs.next_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="next">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Invoices Section -->
+            <section id="invoices" class="content-section">
+                <div class="section-title">
+                    <i class="fas fa-file-invoice"></i>
+                    <h2>Latest Invoices</h2>
+                </div>
+                <div class="document-grid">
+                    {% for doc in latest_invoice_docs %}
+                    <div class="document-card" data-doc-id="{{ doc.id }}" onclick="viewDocument('{{ doc.id }}')">
+                        <i class="fas fa-file-invoice"></i>
+                        <p>{{ doc.title }}</p>
+                    </div>
+                    {% empty %}
+                    <p>No invoices uploaded yet.</p>
+                    {% endfor %}
+                </div>
+                <div class="table-container">
+                    <h2>All Invoices</h2>
+                    {% if search_query %}
+                        {% if invoice_docs %}
+                            <p style="color: var(--success); margin-bottom: 15px;">Document found for "{{ search_query }}"</p>
+                        {% else %}
+                            <p style="color: var(--warning); margin-bottom: 15px;">No document found for "{{ search_query }}"</p>
+                        {% endif %}
+                    {% endif %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>
+                                    Size
+                                    <a href="?sort=file_size&order={% if sort == 'file_size' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'file_size' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>
+                                    Uploaded At
+                                    <a href="?sort=uploaded_at&order={% if sort == 'uploaded_at' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'uploaded_at' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in invoice_docs %}
+                            <tr data-doc-id="{{ doc.id }}" data-category="{{ doc.category }}">
+                                <td class="action-buttons">
+                                    <button class="delete-btn" title="Delete" data-doc-id="{{ doc.id }}" data-doc-title="{{ doc.title|escapejs }}" data-doc-category="{{ doc.category }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <a href="{% url 'documents:edit_document' doc.id %}" class="edit-btn" title="Edit" onclick="event.stopPropagation();">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                </td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.title }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_type }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_size|filesizeformat }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.get_category_display }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')"><span class="badge badge-review">Review</span></td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.uploaded_at }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7">No invoices uploaded yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        {% if invoice_docs.has_previous %}
+                            <a href="?page={{ invoice_docs.previous_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="prev">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        {% for num in invoice_docs.paginator.page_range %}
+                            {% if num == invoice_docs.number %}
+                                <span>{{ num }}</span>
+                            {% else %}
+                                <a href="?page={{ num }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if invoice_docs.has_next %}
+                            <a href="?page={{ invoice_docs.next_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="next">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Checks Section -->
+            <section id="checks" class="content-section">
+                <div class="section-title">
+                    <i class="fas fa-money-check-alt"></i>
+                    <h2>Latest Checks</h2>
+                </div>
+                <div class="document-grid">
+                    {% for doc in latest_check_docs %}
+                    <div class="document-card" data-doc-id="{{ doc.id }}" onclick="viewDocument('{{ doc.id }}')">
+                        <i class="fas fa-money-check-alt"></i>
+                        <p>{{ doc.title }}</p>
+                    </div>
+                    {% empty %}
+                    <p>No checks uploaded yet.</p>
+                    {% endfor %}
+                </div>
+                <div class="table-container">
+                    <h2>All Checks</h2>
+                    {% if search_query %}
+                        {% if check_docs %}
+                            <p style="color: var(--success); margin-bottom: 15px;">Document found for "{{ search_query }}"</p>
+                        {% else %}
+                            <p style="color: var(--warning); margin-bottom: 15px;">No document found for "{{ search_query }}"</p>
+                        {% endif %}
+                    {% endif %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>
+                                    Size
+                                    <a href="?sort=file_size&order={% if sort == 'file_size' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'file_size' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>
+                                    Uploaded At
+                                    <a href="?sort=uploaded_at&order={% if sort == 'uploaded_at' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'uploaded_at' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in check_docs %}
+                            <tr data-doc-id="{{ doc.id }}" data-category="{{ doc.category }}">
+                                <td class="action-buttons">
+                                    <button class="delete-btn" title="Delete" data-doc-id="{{ doc.id }}" data-doc-title="{{ doc.title|escapejs }}" data-doc-category="{{ doc.category }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <a href="{% url 'documents:edit_document' doc.id %}" class="edit-btn" title="Edit" onclick="event.stopPropagation();">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                </td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.title }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_type }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_size|filesizeformat }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.get_category_display }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')"><span class="badge badge-review">Review</span></td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.uploaded_at }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7">No checks uploaded yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        {% if check_docs.has_previous %}
+                            <a href="?page={{ check_docs.previous_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="prev">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        {% for num in check_docs.paginator.page_range %}
+                            {% if num == check_docs.number %}
+                                <span>{{ num }}</span>
+                            {% else %}
+                                <a href="?page={{ num }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if check_docs.has_next %}
+                            <a href="?page={{ check_docs.next_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="next">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Resume Section -->
+            <section id="resume" class="content-section">
+                <div class="section-title">
+                    <i class="fas fa-file-alt"></i>
+                    <h2>Latest Resumes</h2>
+                </div>
+                <div class="document-grid">
+                    {% for doc in latest_resume_docs %}
+                    <div class="document-card" data-doc-id="{{ doc.id }}" onclick="viewDocument('{{ doc.id }}')">
+                        <i class="fas fa-file-alt"></i>
+                        <p>{{ doc.title }}</p>
+                    </div>
+                    {% empty %}
+                    <p>No resume documents uploaded yet.</p>
+                    {% endfor %}
+                </div>
+                <div class="table-container">
+                    <h2>All Resumes</h2>
+                    {% if search_query %}
+                        {% if resume_docs %}
+                            <p style="color: var(--success); margin-bottom: 15px;">Document found for "{{ search_query }}"</p>
+                        {% else %}
+                            <p style="color: var(--warning); margin-bottom: 15px;">No document found for "{{ search_query }}"</p>
+                        {% endif %}
+                    {% endif %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>
+                                    Size
+                                    <a href="?sort=file_size&order={% if sort == 'file_size' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'file_size' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>
+                                    Uploaded At
+                                    <a href="?sort=uploaded_at&order={% if sort == 'uploaded_at' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'uploaded_at' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in resume_docs %}
+                            <tr data-doc-id="{{ doc.id }}" data-category="{{ doc.category }}">
+                                <td class="action-buttons">
+                                    <button class="delete-btn" title="Delete" data-doc-id="{{ doc.id }}" data-doc-title="{{ doc.title|escapejs }}" data-doc-category="{{ doc.category }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <a href="{% url 'documents:edit_document' doc.id %}" class="edit-btn" title="Edit" onclick="event.stopPropagation();">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                </td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.title }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_type }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.file_size|filesizeformat }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.get_category_display }}</td>
+                                <td onclick="viewDocument('{{ doc.id }}')"><span class="badge badge-review">Review</span></td>
+                                <td onclick="viewDocument('{{ doc.id }}')">{{ doc.uploaded_at }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7">No resume documents uploaded yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        {% if resume_docs.has_previous %}
+                            <a href="?page={{ resume_docs.previous_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="prev">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        {% for num in resume_docs.paginator.page_range %}
+                            {% if num == resume_docs.number %}
+                                <span>{{ num }}</span>
+                            {% else %}
+                                <a href="?page={{ num }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if resume_docs.has_next %}
+                            <a href="?page={{ resume_docs.next_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="next">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Shared Documents Section -->
+            <section id="shared-documents" class="content-section">
+                <div class="section-title">
+                    <i class="fas fa-share-alt"></i>
+                    <h2>Latest Shared Documents</h2>
+                </div>
+                <div class="document-grid">
+                    {% for shared_doc in latest_shared_docs %}
+                    <div class="document-card" data-doc-id="{{ shared_doc.document.id }}" onclick="viewDocument('{{ shared_doc.document.id }}')">
+                        <i class="fas fa-share-alt"></i>
+                        <p>{{ shared_doc.document.title }}</p>
+                        <small>Shared by {{ shared_doc.shared_by.username }} ({{ shared_doc.get_permission_display }})</small>
+                    </div>
+                    {% empty %}
+                    <p>No shared documents available.</p>
+                    {% endfor %}
+                </div>
+                <div class="table-container">
+                    <h2>All Shared Documents</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Shared By</th>
+                                <th>Permission</th>
+                                <th>
+                                    Shared At
+                                    <a href="?sort=shared_at&order={% if sort == 'shared_at' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                                        {% if sort == 'shared_at' and order == 'asc' %}
+                                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6 15 12 9 18 15"></polyline>
+                                            </svg>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for shared_doc in shared_docs %}
+                            <tr onclick="viewDocument('{{ shared_doc.document.id }}')">
+                                <td>{{ shared_doc.document.title }}</td>
+                                <td>{{ shared_doc.shared_by.username }}</td>
+                                <td>{{ shared_doc.get_permission_display }}</td>
+                                <td>{{ shared_doc.shared_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">No shared documents available.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        {% if shared_docs.has_previous %}
+                            <a href="?page={{ shared_docs.previous_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="prev">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        {% for num in shared_docs.paginator.page_range %}
+                            {% if num == shared_docs.number %}
+                                <span>{{ num }}</span>
+                            {% else %}
+                                <a href="?page={{ num }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if shared_docs.has_next %}
+                            <a href="?page={{ shared_docs.next_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="next">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="section-title">
+                    <i class="fas fa-cog"></i>
+                    <h2>Settings</h2>
+                </div>
+                <div class="table-container">
+                    <h2>Account Settings</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Option</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Change Password</td>
+                                <td>Enabled</td>
+                                <td><button class="btn btn-primary" onclick="changePassword()">Change</button></td>
+                            </tr>
+                            <tr>
+                                <td>Profile Update</td>
+                                <td>Enabled</td>
+                                <td><button class="btn btn-primary" onclick="updateProfile()">Update</button></td>
+                            </tr>
+                            <tr>
+                                <td>Notifications</td>
+                                <td>Enabled</td>
+                                <td><button class="btn btn-primary" onclick="toggleNotifications()">Toggle</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Loading Overlay -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loader">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div class="delete-modal-overlay" id="deleteModal">
+                <div class="delete-modal-container">
+                    <div class="delete-modal-header">
+                        <h2 id="deleteModalTitle">Delete Document?</h2>
+                        <button class="close" onclick="closeDeleteModal()">×</button>
+                    </div>
+                    <div class="delete-modal-content">
+                        <p id="deleteModalMessage">Are you sure you want to delete this document? This action cannot be undone.</p>
+                    </div>
+                    <div class="delete-modal-footer">
+                        <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                        <button class="btn-delete" id="confirmDeleteBtn" onclick="confirmDelete()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Include the upload modal -->
+    {% include "documents/upload.html" %}
+
+    <script>
+        // Global mappings for categories and sections
+        const sectionCategoryMap = {
+            'License': 'license',
+            'Passport': 'passport',
+            'Invoice': 'invoices',
+            'Check': 'checks',
+            'Resume': 'resume'
+        };
+
+        const categoryFromSection = {
+            'license': 'License',
+            'passport': 'Passport',
+            'invoices': 'Invoice',
+            'checks': 'Check',
+            'resume': 'Resume'
+        };
+
+        const modal = document.getElementById('uploadModal');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const browseFilesBtn = document.getElementById('browseFilesBtn');
+        const fileList = document.getElementById('fileList');
+        const uploadForm = document.getElementById('uploadForm');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        function openUploadModal() {
+            document.body.classList.add('modal-open');
+            modal.style.display = 'flex';
+        }
+
+        function closeUploadModal() {
+            document.body.classList.remove('modal-open');
+            modal.style.display = 'none';
+            fileInput.value = '';
+            fileList.innerHTML = '';
+        }
+
+        function showLoading() {
+            loadingOverlay.style.display = 'flex';
+        }
+
+        function hideLoading() {
+            loadingOverlay.style.display = 'none';
+        }
+
+        function updateSelectedFilesDisplay(files) {
+            fileList.innerHTML = '';
+            Array.from(files).forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.classList.add('file-item');
+                fileItem.innerHTML = `
+                    <span>${file.name}</span>
+                    <button class="cancel-btn" onclick="removeFile(${index})">X</button>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function removeFile(index) {
+            const dataTransfer = new DataTransfer();
+            const files = fileInput.files;
+            Array.from(files).forEach((file, i) => {
+                if (i !== index) dataTransfer.items.add(file);
+            });
+            fileInput.files = dataTransfer.files;
+            updateSelectedFilesDisplay(fileInput.files);
+        }
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const dataTransfer = new DataTransfer();
+                Array.from(files).forEach(file => dataTransfer.items.add(file));
+                fileInput.files = dataTransfer.files;
+                updateSelectedFilesDisplay(fileInput.files);
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            updateSelectedFilesDisplay(fileInput.files);
+        });
+
+        browseFilesBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        window.onclick = function(event) {
+            if (event.target === modal) closeUploadModal();
+        };
+
+        // Utility Functions
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function normalizeCategory(category) {
+            if (!category) return null;
+            const categoryMap = {
+                'license': 'License',
+                'check': 'Check',
+                'invoice': 'Invoice',
+                'passport': 'Passport',
+                'resume': 'Resume',
+                'LICENSE': 'License',
+                'CHECK': 'Check',
+                'INVOICE': 'Invoice',
+                'PASSPORT': 'Passport',
+                'RESUME': 'Resume'
+            };
+            return categoryMap[category.toLowerCase()] || category;
+        }
+
+        function stripExtension(filename) {
+            return filename.replace(/\.[^/.]+$/, "");
+        }
+
+        // Document Management Functions
+        function appendDocumentToGrid(doc, sectionId) {
+            console.log(`Appending document ${doc.id} to grid in section ${sectionId}`);
+            const grid = document.querySelector(`#${sectionId} .document-grid`);
+            if (!grid) {
+                console.error(`Grid not found for section ${sectionId}`);
+                return;
+            }
+
+            const docCategory = normalizeCategory(doc.category);
+            if (sectionId !== 'documents') {
+                const sectionCategory = categoryFromSection[sectionId];
+                if (docCategory !== sectionCategory) {
+                    console.log(`Document ${doc.id} category (${docCategory}) does not match section ${sectionId} category (${sectionCategory}). Skipping.`);
+                    return;
+                }
+            }
+
+            const noDocsMessage = grid.querySelector('p');
+            if (noDocsMessage && noDocsMessage.textContent.includes('No documents uploaded yet')) {
+                console.log('Removing "No documents uploaded yet" message from grid');
+                noDocsMessage.remove();
+            }
+
+            const card = document.createElement('div');
+            card.className = 'document-card';
+            card.setAttribute('data-doc-id', doc.id);
+            card.setAttribute('onclick', `viewDocument('${doc.id}')`);
+
+            let iconClass = 'fas fa-file';
+            if (sectionId === 'license') iconClass = 'fas fa-id-card';
+            else if (sectionId === 'passport') iconClass = 'fas fa-passport';
+            else if (sectionId === 'invoices') iconClass = 'fas fa-file-invoice';
+            else if (sectionId === 'checks') iconClass = 'fas fa-money-check-alt';
+            else if (sectionId === 'resume') iconClass = 'fas fa-file-alt';
+
+            // Remove file extension from document title
+            const displayTitle = stripExtension(doc.title);
+
+            card.innerHTML = `
+                <i class="${iconClass}"></i>
+                <p>${displayTitle}</p>
+            `;
+            grid.insertBefore(card, grid.firstChild);
+            console.log(`Added document card ${doc.id} to grid`);
+        }
+
+
+        function appendDocumentToTable(doc, sectionId) {
+            console.log(`Appending document ${doc.id} to table in section ${sectionId}`);
+            const tbody = document.querySelector(`#${sectionId} .table-container tbody`);
+            if (!tbody) {
+                console.error(`Table body not found for section ${sectionId}`);
+                return;
+            }
+
+            const docCategory = normalizeCategory(doc.category);
+            if (sectionId !== 'documents') {
+                const sectionCategory = categoryFromSection[sectionId];
+                if (docCategory !== sectionCategory) {
+                    console.log(`Document ${doc.id} category (${docCategory}) does not match section ${sectionId} category (${sectionCategory}). Skipping.`);
+                    return;
+                }
+            }
+
+            const noDocsRow = tbody.querySelector('tr td[colspan="7"]');
+            if (noDocsRow && noDocsRow.textContent.includes('No documents uploaded yet')) {
+                console.log('Removing "No documents uploaded yet" message from table');
+                noDocsRow.parentElement.remove();
+            }
+            
+            // Remove file extension from the title
+            const displayTitle = stripExtension(doc.title);
+
+            const row = document.createElement('tr');
+            row.setAttribute('data-doc-id', doc.id);
+            row.setAttribute('data-category', doc.category);
+            row.innerHTML = `
+                <td class="action-buttons">
+                    <button class="delete-btn" title="Delete" data-doc-id="${doc.id}" data-doc-title="${displayTitle}" data-doc-category="${doc.category}" onclick="event.stopPropagation(); showDeleteModal('${doc.id}', '${displayTitle}', '${doc.category}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <a href="/documents/edit/${doc.id}/" class="edit-btn" title="Edit" onclick="event.stopPropagation();">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                </td>
+                <td onclick="viewDocument('${doc.id}')">${displayTitle}</td>
+                <td onclick="viewDocument('${doc.id}')">${doc.file_type || 'Unknown'}</td>
+                <td onclick="viewDocument('${doc.id}')">${formatFileSize(doc.file_size)}</td>
+                <td onclick="viewDocument('${doc.id}')">${docCategory}</td>
+                <td onclick="viewDocument('${doc.id}')"><span class="badge badge-review">Review</span></td>
+                <td onclick="viewDocument('${doc.id}')">${doc.uploaded_at}</td>
+            `;
+            row.style.animation = 'rowFadeIn 0.5s ease-in-out';
+            tbody.insertBefore(row, tbody.firstChild);
+            console.log(`Added document row ${doc.id} to table`);
+        }
+
+
+        function removeDocumentFromGrid(docId, sectionId) {
+            const selector = `#${sectionId} .document-card[data-doc-id="${docId}"]`;
+            const elements = document.querySelectorAll(selector);
+            console.log(`Removing ${elements.length} grid elements for docId ${docId} in section ${sectionId}`);
+            elements.forEach(element => element.remove());
+
+            const grid = document.querySelector(`#${sectionId} .document-grid`);
+            if (grid && !grid.querySelector('.document-card')) {
+                grid.innerHTML = `<p>No ${sectionId === 'documents' ? 'documents' : sectionId} uploaded yet.</p>`;
+            }
+        }
+
+        function removeDocumentFromTable(docId, sectionId) {
+            const selector = `#${sectionId} tr[data-doc-id="${docId}"]`;
+            const elements = document.querySelectorAll(selector);
+            console.log(`Removing ${elements.length} table rows for docId ${docId} in section ${sectionId}`);
+            elements.forEach(element => element.remove());
+
+            const tbody = document.querySelector(`#${sectionId} tbody`);
+            if (tbody && !tbody.querySelector('tr')) {
+                tbody.innerHTML = `<tr><td colspan="7">No ${sectionId === 'documents' ? 'documents' : sectionId} uploaded yet.</td></tr>`;
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const messagesContainer = document.getElementById('uploadMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.innerHTML = `
+                ${message}
+                <button class="message-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            messagesContainer.appendChild(messageDiv);
+            setTimeout(() => messageDiv.remove(), 3000); // Remove after 3 seconds
+        }
+
+
+        function updateDocumentCount(sectionId, increment) {
+            console.log(`Updating document count for section: ${sectionId}, increment: ${increment}`);
+            const docCountElement = document.querySelector(`.nav-item[data-section="${sectionId}"] .document-count`);
+            if (docCountElement) {
+                const currentCount = parseInt(docCountElement.textContent) || 0;
+                const newCount = Math.max(currentCount + increment, 0);
+                docCountElement.textContent = newCount;
+                console.log(`Updated count for ${sectionId}: ${newCount}`);
+            } else {
+                console.error(`Document count element not found for section: ${sectionId}`);
+            }
+        }
+
+        // Upload Handling
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(uploadForm);
+
+            closeUploadModal();
+            showLoading();
+
+            fetch(uploadForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                const messagesContainer = document.getElementById('uploadMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${data.status}-message`;
+                messageDiv.innerHTML = `
+                    ${data.message}
+                    <button class="message-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                messagesContainer.appendChild(messageDiv);
+
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 3000);
+
+                if (data.status === 'success' && data.document) {
+                    console.log('Upload successful, document:', data.document);
+                    
+                    const normalizedCategory = normalizeCategory(data.document.category);
+                    data.document.category = normalizedCategory;
+
+                    appendDocumentToGrid(data.document, 'documents');
+                    appendDocumentToTable(data.document, 'documents');
+                    updateDocumentCount('documents', 1);
+
+                    const sectionId = sectionCategoryMap[normalizedCategory];
+                    if (sectionId) {
+                        appendDocumentToGrid(data.document, sectionId);
+                        appendDocumentToTable(data.document, sectionId);
+                        updateDocumentCount(sectionId, 1);
+                    }
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Upload error:', error);
+                showToast(`An error occurred: ${error.message}`, 'error');
+            });
+        });
+
+        // Section Selection
+        function selectSection(navItem) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            navItem.classList.add('active');
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            const sectionId = navItem.getAttribute('data-section');
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Delete Functionality
+        let currentDocId = null;
+        let currentDocCategory = null;
+
+        function showDeleteModal(docId, docTitle, category) {
+            currentDocId = docId;
+            currentDocCategory = category;
+            const modal = document.getElementById('deleteModal');
+            const titleElement = document.getElementById('deleteModalTitle');
+            const messageElement = document.getElementById('deleteModalMessage');
+            const deleteBtn = document.getElementById('confirmDeleteBtn');
+
+            showLoading();
+
+            fetch(`/documents/check-shared-status/${docId}/`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                modal.style.display = 'flex';
+                document.body.classList.add('modal-open');
+
+                if (data.is_shared) {
+                    titleElement.textContent = 'Delete Shared Document?';
+                    titleElement.className = 'shared';
+                    messageElement.textContent = `The document "${docTitle}" is shared with ${data.shared_with_count} user(s): ${data.shared_with_usernames}. Deleting it will remove access for everyone. Are you sure?`;
+                    messageElement.className = 'shared';
+                    deleteBtn.className = 'btn-delete';
+                } else {
+                    titleElement.textContent = 'Delete Document?';
+                    titleElement.className = 'not-shared';
+                    messageElement.textContent = `Are you sure you want to delete "${docTitle}"? This action cannot be undone.`;
+                    messageElement.className = 'not-shared';
+                    deleteBtn.className = 'btn-delete not-shared';
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error checking shared status:', error);
+                showToast('Error checking document status', 'error');
+            });
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
+            currentDocId = null;
+            currentDocCategory = null;
+        }
+
+        function confirmDelete() {
+            if (!currentDocId) return;
+
+            showLoading();
+
+            const formData = new FormData();
+            formData.append('delete_document', 'true');
+            formData.append('doc_id', currentDocId);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            fetch('', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Deletion failed');
+                return response.json();
+            })
+            .then(data => {
+                if (data.status !== 'success') throw new Error(data.message || 'Deletion failed');
+
+                // Update UI after successful deletion
+                const normalizedCategory = normalizeCategory(currentDocCategory);
+                const sectionId = sectionCategoryMap[normalizedCategory];
+                const sectionsToUpdate = ['documents'];
+                if (sectionId) {
+                    sectionsToUpdate.push(sectionId);
+                }
+
+                sectionsToUpdate.forEach(section => {
+                    removeDocumentFromGrid(currentDocId, section);
+                    removeDocumentFromTable(currentDocId, section);
+                    updateDocumentCount(section, -1);
+                });
+
+                showToast('Document deleted successfully', 'success');
+            })
+            .catch(error => {
+                console.error('Deletion error:', error);
+                showToast(error.message || 'Failed to delete document', 'error');
+            })
+            .finally(() => {
+                hideLoading();
+                closeDeleteModal();
+            });
+        }
+
+        // Event Listeners
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.stopPropagation();
+                const docId = this.getAttribute('data-doc-id');
+                const docTitle = this.getAttribute('data-doc-title');
+                const docCategory = this.getAttribute('data-doc-category');
+                showDeleteModal(docId, docTitle, docCategory);
+            });
+        });
+
+        // Navigation Functions
+        function logout() {
+            window.location.href = "/logout/";
+        }
+
+        function viewDocument(docId) {
+            window.location.href = `/documents/view/${docId}`;
+        }
+
+        function changePassword() {
+            window.location.href = "/accounts/change-password/";
+        }
+
+        function updateProfile() {
+            window.location.href = "/accounts/profile/";
+        }
+
+        function toggleNotifications() {
+            alert("Notification toggle functionality to be implemented.");
+        }
+    </script>
+</body>
+</html>

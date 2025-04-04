@@ -1,0 +1,28 @@
+<!-- Upload Modal (Adapted from sharing.html structure) -->
+<div class="modal-overlay" id="uploadModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2><i class="fas fa-file-upload"></i> Upload Document</h2>
+            <span class="close" onclick="closeUploadModal()">×</span>
+        </div>
+        <form id="uploadForm" action="{% url 'documents:upload' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="file-upload-container" id="dropZone">
+                <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                <p>Drag & Drop files here or click to browse</p>
+                <input type="file" id="fileInput" name="document" multiple style="display: none;">
+                <button type="button" id="browseFilesBtn">Browse Files</button>
+            </div>
+            <div class="file-list" id="fileList"></div>
+            <div class="upload-progress" id="uploadProgress">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
+        </form>
+    </div>
+</div>
