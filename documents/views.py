@@ -47,7 +47,6 @@ def check_shared_status(request, doc_id):
 
 logger = logging.getLogger(__name__)
 
-@login_required(login_url='/login/')
 # documents/views.py
 @login_required(login_url='/login/')
 def upload_document(request):
@@ -73,7 +72,7 @@ def upload_document(request):
 
             # Save document metadata to the database
             doc = Document(
-                title=uploaded_file.name,
+                title=os.path.splitext(uploaded_file.name)[0],
                 file=uploaded_file,
                 file_type=file_extension,
                 file_size=uploaded_file.size,
