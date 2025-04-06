@@ -2042,10 +2042,6 @@
             return categoryMap[category.toLowerCase()] || category;
         }
 
-        function stripExtension(filename) {
-            return filename.replace(/\.[^/.]+$/, "");
-        }
-
         // Document Management Functions
         function appendDocumentToGrid(doc, sectionId) {
             console.log(`Appending document ${doc.id} to grid in section ${sectionId}`);
@@ -2083,7 +2079,7 @@
             else if (sectionId === 'resume') iconClass = 'fas fa-file-alt';
 
             // Remove file extension from document title
-            const displayTitle = stripExtension(doc.title);
+            const displayTitle = doc.title;
 
             card.innerHTML = `
                 <i class="${iconClass}"></i>
@@ -2118,7 +2114,7 @@
             }
             
             // Remove file extension from the title
-            const displayTitle = stripExtension(doc.title);
+            const displayTitle = doc.title;
 
             const row = document.createElement('tr');
             row.setAttribute('data-doc-id', doc.id);
