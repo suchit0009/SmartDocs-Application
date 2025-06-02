@@ -1,0 +1,22 @@
+{% load static %}
+
+<div class="document-grid">
+    <!-- Debugging: Display category and document count -->
+    {% if debug %}
+        <p>Debug: Category={{ category }}, Documents={{ documents|length }}</p>
+    {% endif %}
+    
+    {% for doc in documents %}
+    <div class="document-card" data-doc-id="{{ doc.id }}" onclick="viewDocument('{{ doc.id }}')">
+            <i class="fas fa-{{ icon|default:'file' }}"></i>
+            <p>{{ doc.title }}</p>
+            <!-- Debugging: Show document category -->
+            {% if debug %}
+                <small>Category: {{ doc.category }}</small>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>No {{ category|lower }} uploaded yet.</p>
+    {% endfor %}
+</div>
+

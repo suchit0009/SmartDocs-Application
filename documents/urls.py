@@ -15,6 +15,6 @@ urlpatterns = [
     path('document/<int:doc_id>/update/', views.update_document_data, name='update_document_data'),
     path('check-shared-status/<int:doc_id>/', views.check_shared_status, name='check_shared_status'),
     path('download/<int:doc_id>/', views.download_document, name='download_document'),
-    path('documents/document/<int:doc_id>/ask/', views.ask_document_question, name='ask_document_question'),
-]
+    path('document/<int:doc_id>/ask/', views.ask_document_question, name='ask_document_question'),
+] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
 

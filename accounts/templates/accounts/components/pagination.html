@@ -1,0 +1,19 @@
+<div class="pagination">
+    {% if paginator.has_previous %}
+        <a href="?page={{ paginator.previous_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="prev">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+    {% endif %}
+    {% for num in paginator.paginator.page_range %}
+        {% if num == paginator.number %}
+            <span>{{ num }}</span>
+        {% else %}
+            <a href="?page={{ num }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    {% if paginator.has_next %}
+        <a href="?page={{ paginator.next_page_number }}{% if sort %}&sort={{ sort }}&order={{ order }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="next">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+    {% endif %}
+</div>

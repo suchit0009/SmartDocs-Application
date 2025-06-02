@@ -1,0 +1,87 @@
+{% load static %}
+
+<div class="sidebar">
+    <div class="sidebar-header">
+        <a href="{% url 'home' %}" class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <span class="logo-text">SmartDocs</span>
+        </a>
+    </div>
+    
+    <div class="user-profile">
+        <div class="avatar">
+            {{ request.user.username|slice:":2"|upper }}
+        </div>
+        <div class="user-info">
+            <div class="user-name"><b>{{ request.user.username }}</b></div>
+            {% if request.user.email %}
+                <div class="user-email">{{ request.user.email }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="section-title">Document Categories</div>
+    <ul class="nav-list">
+        <li class="nav-item {% if active_section == 'documents' %}active{% endif %}" data-section="documents">
+            <div class="nav-text-group">
+                <div class="nav-icon"><i class="fas fa-file"></i></div>
+                <div class="nav-text">My Documents</div>
+            </div>
+            <div class="document-count">{{ total_documents|default:"0" }}</div>
+        </li>
+        <li class="nav-item {% if active_section == 'license' %}active{% endif %}" data-section="license">
+            <div class="nav-text-group">
+                <div class="nav-icon"><i class="fas fa-id-card"></i></div>
+                <div class="nav-text">License</div>
+            </div>
+            <div class="document-count">{{ license_count|default:"0" }}</div>
+        </li>
+        <li class="nav-item {% if active_section == 'passport' %}active{% endif %}" data-section="passport">
+            <div class="nav-text-group">
+                <div class="nav-icon"><i class="fas fa-passport"></i></div>
+                <div class="nav-text">Passport</div>
+            </div>
+            <div class="document-count">{{ passport_count|default:"0" }}</div>
+        </li>
+        <li class="nav-item {% if active_section == 'invoices' %}active{% endif %}" data-section="invoices">
+            <div class="nav-text-group">
+                <div class="nav-icon"><i class="fas fa-file-invoice"></i></div>
+                <div class="nav-text">Invoices</div>
+            </div>
+            <div class="document-count">{{ invoice_count|default:"0" }}</div>
+        </li>
+        <li class="nav-item {% if active_section == 'checks' %}active{% endif %}" data-section="checks">
+            <div class="nav-text-group">
+                <div class="nav-icon"><i class="fas fa-money-check-alt"></i></div>
+                <div class="nav-text">Checks</div>
+            </div>
+            <div class="document-count">{{ check_count|default:"0" }}</div>
+        </li>
+        <li class="nav-item {% if active_section == 'resume' %}active{% endif %}" data-section="resume">
+            <div class="nav-text-group">
+                <div class="nav-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="nav-text">Resume</div>
+            </div>
+            <div class="document-count">{{ resume_count|default:"0" }}</div>
+        </li>
+        <li class="nav-item {% if active_section == 'shared-documents' %}active{% endif %}" data-section="shared-documents">
+            <div class="nav-text-group">
+                <div class="nav-icon"><i class="fas fa-share-alt"></i></div>
+                <div class="nav-text">Shared Documents</div>
+            </div>
+            <div class="document-count">{{ shared_count|default:"0" }}</div>
+        </li>
+    </ul>
+    
+    <div class="section-title">Settings</div>
+    <ul class="nav-list">
+        <li class="nav-item {% if active_section == 'settings' %}active{% endif %}" data-section="settings">
+            <div class="nav-text-group">
+                <div class="nav-icon"><i class="fas fa-cog"></i></div>
+                <div class="nav-text">Settings</div>
+            </div>
+        </li>
+    </ul>
+</div>

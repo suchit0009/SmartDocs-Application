@@ -1,0 +1,76 @@
+{% load static %}
+
+<div class="table-container">
+    <h2>{{ title }}</h2>
+    {% if search_query %}
+        {% if documents %}
+            <p style="color: var(--success); margin-bottom: 15px;">Document found for "{{ search_query }}"</p>
+        {% else %}
+            <p style="color: var(--warning); margin-bottom: 15px;">No document found for "{{ search_query }}"</p>
+        {% endif %}
+    {% endif %}
+    <table>
+        <thead>
+            <tr>
+                <th class="action-column"></th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>
+                    Size
+                    <a href="?sort=file_size&order={% if sort == 'file_size' and order == 'asc' %}desc{% else %}asc{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if page %}&page={{ page }}{% endif %}">
+                        {% if sort == 'file_size' and order == 'asc' %}
+                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        {% else %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 15 12 9 18 15"></polyline>
+                            </svg>
+                        {% endif %}
+                    </a>
+                </th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>
+                    Uploaded At
+                    <a href="?sort=uploaded_at&order={% if sort == 'uploaded_at' and order == 'asc' %}desc{% else %}asc{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if page %}&page={{ page }}{% endif %}">
+                        {% if sort == 'uploaded_at' and order == 'asc' %}
+                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        {% else %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 15 12 9 18 15"></polyline>
+                            </svg>
+                        {% endif %}
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doc in documents %}
+            <tr data-doc-id="{{ doc.id }}" data-category="{{ doc.category }}" onclick="viewDocument('{{ doc.id }}')">
+                <td class="action-buttons">
+                    <button class="delete-btn" title="Delete" data-doc-id="{{ doc.id }}" data-doc-title="{{ doc.title|escapejs }}" data-doc-category="{{ doc.category }}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <a href="{% url 'documents:edit_document' doc.id %}" class="edit-btn" title="Edit" onclick="event.stopPropagation();">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                </td>
+                <td class="view-document">{{ doc.title }}</td>
+                <td class="view-document">{{ doc.file_type|default:"Unknown" }}</td>
+                <td class="view-document">{{ doc.file_size|filesizeformat }}</td>
+                <td class="view-document">{{ doc.get_category_display }}</td>
+                <td class="view-document"><span class="badge badge-{{ doc.status|lower|default:'review' }}">{{ doc.status|default:"Review" }}</span></td>
+                <td class="view-document">{{ doc.uploaded_at }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No {{ category|lower }} uploaded yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% include 'accounts/components/pagination.html' with paginator=documents %}
+</div>

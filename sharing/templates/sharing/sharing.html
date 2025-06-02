@@ -1,0 +1,38 @@
+{% load static %}
+<!-- Modal Popup for Sharing -->
+
+<div class="modal-overlay" id="shareModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2 class="modal-title">Share Document</h2>
+            <button class="modal-close" id="closeModal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" id="userSearch" placeholder="Search users...">
+        </div>
+        <div class="selection-count" id="selectionCount">
+            <i class="fas fa-users"></i>
+            <span id="selectedCount">0</span>
+        </div>
+        <div class="user-list" id="userList"></div>
+        <div class="permission-section">
+            <div class="section-title">Permission</div>
+            <div class="permission-options">
+                <div class="permission-option" data-permission="view">
+                    <i class="fas fa-eye permission-icon"></i>
+                    <div class="permission-label">Can View</div>
+                </div>
+                <div class="permission-option" data-permission="edit">
+                    <i class="fas fa-edit permission-icon"></i>
+                    <div class="permission-label">Can Edit</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelShare">Cancel</button>
+            <button class="btn btn-primary" id="confirmShare">Share</button>
+        </div>
+    </div>
+</div>
+

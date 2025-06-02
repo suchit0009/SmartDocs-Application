@@ -54,6 +54,7 @@ def classify_document(image_path):
     # Use argmax to get the predicted label
     pred_label_idx = torch.argmax(logits, dim=1).item()
     pred_label = idx2label[pred_label_idx]
+    print(f"Predicted label: {pred_label}")
     
     return pred_label
 

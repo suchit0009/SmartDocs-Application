@@ -1,0 +1,20 @@
+{% load static %}
+
+<div class="header">
+    <button class="upload-btn" onclick="openUploadModal()">
+        <i class="fas fa-file-upload"></i> Upload Document
+    </button>
+    <div class="search-bar">
+        <form method="get" action="">
+            <input type="text" name="search" placeholder="Search by title..." value="{{ search_query }}">
+        </form>
+    </div>
+    <button class="logout-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+    <!-- Add the logout URL as a hidden input -->
+    <input type="hidden" id="logout-url" value="{% url 'logout' %}">
+</div>
+
+<!-- Ensure CSRF token is available -->
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">

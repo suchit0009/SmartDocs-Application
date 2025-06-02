@@ -79,7 +79,6 @@ def share_document(request, document_id):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-
 @login_required
 def shared_documents(request):
     """Get documents shared with the current user"""

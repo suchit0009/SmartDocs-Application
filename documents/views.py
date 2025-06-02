@@ -1,30 +1,26 @@
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from .models import Document, DocumentInformation
-import os
-from inference.inference import classify_document
-from inference.inference_license_roboflow import extract_license_info
-from django.shortcuts import render, get_object_or_404
-from django.http import Http404
-from .models import Document
-from sharing.models import SharedDocument  # Add this import
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, FileResponse, Http404
 from django.contrib.auth.decorators import login_required
-from .models import Document, DocumentInformation
-import os
-from inference.inference import classify_document
-from sharing.models import SharedDocument
+from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
-from inference.inference_check_roboflow import extract_check_info
-from inference.inference_invoice_donut import  run_information_extraction, run_docvqa
-from inference.inference_passport_roboflow import extract_passport_info
-from inference.inference_resume_roboflow import extract_resume_info
-from documents.models import ChatMessage
+from django.contrib.auth import get_user_model
+import json
+import os
 import tempfile
 import logging
-from django.contrib.auth import get_user_model
+
+# Model imports
+from .models import Document, DocumentInformation
+from sharing.models import SharedDocument
+from documents.models import ChatMessage
+
+# Inference imports
+from inference.inference import classify_document
+from inference.inference_license_roboflow import extract_license_info
+from inference.inference_check_roboflow import extract_check_info
+from inference.inference_invoice_donut import run_information_extraction, run_docvqa
+from inference.inference_passport_roboflow import extract_passport_info
+from inference.inference_resume_roboflow import extract_resume_info
 
 @login_required
 def check_shared_status(request, doc_id):
@@ -169,9 +165,10 @@ def upload_document(request):
                     'id': doc.id,
                     'title': doc.title,
                     'file_type': doc.file_type or 'Unknown',
-                    'file_size': doc.file_size,  # In bytes, frontend can format it
-                    'category': doc.get_category_display(),
-                    'uploaded_at': doc.uploaded_at.strftime('%Y-%m-%d %H:%M:%S'),  # Format for display
+                    'file_size': doc.file_size,
+                    'category': doc.get_category_display(),  # Use display value for category
+                    'uploaded_at': doc.uploaded_at.strftime('%Y-%m-%d %H:%M:%S'),
+                    'status': doc.status if hasattr(doc, 'status') else 'Review'  # Include status
                 }
             }, status=200)
 
@@ -203,7 +200,6 @@ def document_list(request):
 
 @login_required(login_url='/login/')
 def document_detail(request, doc_id):
-    print("DEBUG: document_detail loaded")
     document = get_object_or_404(Document, id=doc_id)
     
     has_access = document.uploaded_by == request.user
@@ -222,22 +218,18 @@ def document_detail(request, doc_id):
     else:
         has_edit_permission = True
     
-    # Get chat history with debugging
-    chat_history = ChatMessage.objects.filter(user=request.user, document=document)
-    print(f"User ID: {request.user.id}, Username: {request.user.username}")
-    print(f"Document ID: {document.id}, Title: {document.title}")
-    print(f"Chat history count: {chat_history.count()}")
-    if not chat_history.exists():
-        print("No messages found for this user and document.")
-        print(f"Total ChatMessages in DB: {ChatMessage.objects.count()}")
-        print(f"Messages for this document: {ChatMessage.objects.filter(document=document).count()}")
-        print(f"Messages for this user: {ChatMessage.objects.filter(user=request.user).count()}")
+    # Fetch extracted information
+    doc_info = document.information.first()
+    extracted_info = doc_info.extracted_info if doc_info else {}
+    
+    # Get chat history for invoices
+    chat_history = ChatMessage.objects.filter(user=request.user, document=document) if document.category == 'Invoice' else []
 
-    template_name = f"documents/document_{document.category.lower()}.html"
-    return render(request, template_name, {
+    return render(request, 'documents/document_detail.html', {
         "document": document,
         "has_edit_permission": has_edit_permission,
-        "chat_history": chat_history  # Ensure this is passed
+        "extracted_info": extracted_info,
+        "chat_history": chat_history
     })
 
 def edit_document(request, doc_id):
@@ -258,73 +250,6 @@ def edit_document(request, doc_id):
         'document': document,
         'categories': Document.CATEGORY_CHOICES,
     })
-
-def fetch_document_data(request, doc_id):
-    try:
-        # Critical fix: Use 'id' not 'doc_id' field
-        document = Document.objects.get(id=doc_id)
-        
-        # Use select_related to optimize query
-        doc_info = document.information.first()
-        
-        if not doc_info:
-            return JsonResponse(
-                {'error': 'Document exists but no extracted data found'},
-                status=404
-            )
-            
-        return JsonResponse(doc_info.extracted_info, safe=False)
-        
-    except Document.DoesNotExist:
-        return JsonResponse({'error': 'Document not found'}, status=404)
-
-from django.views.decorators.csrf import csrf_protect
-from django.http import JsonResponse
-import json
-
-@login_required
-@csrf_protect
-def update_document_data(request, doc_id):
-    if request.method == 'POST':
-        try:
-            # Get the document
-            document = Document.objects.get(id=doc_id)
-            
-            # Ensure the user has permission to edit this document
-            if document.uploaded_by != request.user:
-                return JsonResponse({'error': 'Not authorized'}, status=403)
-            
-            # Get the updated data from the request
-            updated_data = json.loads(request.body)
-            
-            # Get the document information object
-            doc_info = document.information.first()
-            
-            if not doc_info:
-                # Create a new document information object if it doesn't exist
-                doc_info = DocumentInformation(
-                    document=document,
-                    extracted_info=updated_data
-                )
-            else:
-                # Update the existing document information
-                doc_info.extracted_info = updated_data
-            
-            # Save the changes
-            doc_info.save()
-
-            # Add a success message after successful update
-            messages.success(request, "Document successfully updated!")
-            
-            return JsonResponse({'status': 'success'})
-            
-            
-        except Document.DoesNotExist:
-            return JsonResponse({'error': 'Document not found'}, status=404)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/login/')
 def download_document(request, doc_id):

@@ -1,6 +1,7 @@
 # documents/models.py
 from django.db import models
 from django.conf import settings
+from accounts.models import CustomUser  # Import your custom user model
 
 class Document(models.Model):
     CATEGORY_CHOICES = [
@@ -10,12 +11,18 @@ class Document(models.Model):
         ('Check', 'Check'),
         ('Resume', 'Resume'),
     ]
+    STATUS_CHOICES = [
+        ('Review', 'Review'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
 
     title = models.CharField(max_length=255, null=True, blank=True, default='Untitled Document')
     file = models.FileField(upload_to='documents/') 
     file_type = models.CharField(max_length=100, null=True, blank=True)
     file_size = models.IntegerField(null=True, blank=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='OTHER')
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Review')  # Added status field
     uploaded_at = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -28,7 +35,7 @@ class Document(models.Model):
     
     def save(self, *args, **kwargs):
         if self.file and not self.file_size:
-            self.file_size = self.file.size  # Populate file_size in bytes
+            self.file_size = self.file.size
         super().save(*args, **kwargs)
 
 
@@ -39,9 +46,6 @@ class DocumentInformation(models.Model):
     def __str__(self):
         return f"Information for {self.document.title or 'Untitled Document'}"
     
-# documents/models.py
-from django.db import models
-from accounts.models import CustomUser  # Import your custom user model
 
 class ChatMessage(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Reference CustomUser

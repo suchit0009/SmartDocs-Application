@@ -1,0 +1,116 @@
+{% extends 'accounts/base.html' %}
+
+{% load static %}
+
+{% block title %}Profile Update{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="content-card">
+        <div class="card-header">
+            <i class="fas fa-user-edit"></i>
+            <h2>Update Profile</h2>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="success-message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="avatar-container">
+            {% if request.user.profile_picture %}
+                <img src="{{ request.user.profile_picture.url }}" alt="Profile Picture" class="profile-avatar">
+            {% else %}
+                <div class="profile-avatar">{{ request.user.username|slice:":2"|upper }}</div>
+            {% endif %}
+        </div>
+
+        <form action="{% url 'profile' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="error-message">
+                    <ul>
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="error-message">
+                        <ul>
+                            {% for error in form.username.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email Address</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="error-message">
+                        <ul>
+                            {% for error in form.email.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.profile_picture.id_for_label }}">Profile Picture</label>
+                {{ form.profile_picture }}
+                {% if form.profile_picture.errors %}
+                    <div class="error-message">
+                        <ul>
+                            {% for error in form.profile_picture.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                    {{ form.phone_number }}
+                    {% if form.phone_number.errors %}
+                        <div class="error-message">
+                            <ul>
+                                {% for error in form.phone_number.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.birthday.id_for_label }}">Birthday</label>
+                    {{ form.birthday }}
+                    {% if form.birthday.errors %}
+                        <div class="error-message">
+                        <ul>
+                            {% for error in form.birthday.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='/home/'">Cancel</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -5,6 +5,7 @@ import json
 import os
 import re
 from PIL import Image
+import os
 
 def extract_license_info(image_path, device="cpu"):
     """
@@ -19,7 +20,7 @@ def extract_license_info(image_path, device="cpu"):
     # Initialize Roboflow inference client
     CLIENT = InferenceHTTPClient(
         api_url="https://detect.roboflow.com",
-        api_key="5F6f0kVy4vHTtc2KEJUH"
+        api_key=os.getenv("ROBOFLOW_API_KEY")
     )
     
     # Run detection with Roboflow

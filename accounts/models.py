@@ -9,6 +9,3 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username  # Keeps the username as the display name
-
-
-    

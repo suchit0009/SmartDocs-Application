@@ -5,11 +5,12 @@ import numpy as np
 from datetime import datetime
 import re
 import json
+import os
 
 # Initialize the inference client
 CLIENT = InferenceHTTPClient(
     api_url="https://detect.roboflow.com",
-    api_key="5F6f0kVy4vHTtc2KEJUH"
+    api_key = os.getenv("ROBOFLOW_API_KEY")
 )
 
 # Function to extract text from specific regions of the image

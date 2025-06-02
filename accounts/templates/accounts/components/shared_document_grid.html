@@ -1,0 +1,12 @@
+<div class="document-grid">
+    {% for shared_doc in latest_shared_docs %}
+    <div class="document-card" data-doc-id="{{ shared_doc.document.id }}" onclick="viewDocument('{{ shared_doc.document.id }}')">
+        <i class="fas fa-share-alt"></i>
+        <p>{{ shared_doc.document.title }}</p>
+        <small>Shared by {{ shared_doc.shared_by.username }} ({{ shared_doc.get_permission_display }})</small>
+    </div>
+    {% empty %}
+    <p>No shared documents available.</p>
+    {% endfor %}
+</div>
+

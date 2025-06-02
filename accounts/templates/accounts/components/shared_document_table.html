@@ -1,0 +1,43 @@
+{% load static %}
+
+<div class="table-container">
+    <h2>{{ title }}</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Shared By</th>
+                <th>Permission</th>
+                <th>
+                    Shared At
+                    <a href="?sort=shared_at&order={% if sort == 'shared_at' and order == 'asc' %}desc{% else %}asc{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if page %}&page={{ page }}{% endif %}">
+                        {% if sort == 'shared_at' and order == 'asc' %}
+                            <svg class="sort-asc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        {% else %}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 15 12 9 18 15"></polyline>
+                            </svg>
+                        {% endif %}
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for shared_doc in documents %}
+            <tr class="view-document" data-doc-id="{{ shared_doc.document.id }}" onclick="viewDocument('{{ shared_doc.document.id }}')">
+                <td>{{ shared_doc.document.title }}</td>
+                <td>{{ shared_doc.shared_by.username }}</td>
+                <td>{{ shared_doc.get_permission_display }}</td>
+                <td>{{ shared_doc.shared_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No shared documents available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% include 'accounts/components/pagination.html' with paginator=documents %}
+</div>
