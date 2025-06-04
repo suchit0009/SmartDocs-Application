@@ -1,6 +1,11 @@
 # SmartDocs
 
-AI-powered document management system for automatic classification, information extraction, and visual question answering.
+AI-powered document management system for automatic classification, information extraction, and visual question answering. 
+
+
+## Demo Video
+
+[📹 Watch Demo Video](https://drive.google.com/file/d/1Ko5gan1T2FDQWHv0KzxMLIVpkoFoIC3e/view?usp=sharing)
 
 ## Features
 
