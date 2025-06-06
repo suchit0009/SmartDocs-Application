@@ -33,7 +33,6 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
-pip install transformers
 
 # Run application
 python manage.py runserver
