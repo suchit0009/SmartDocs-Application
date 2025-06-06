@@ -5,7 +5,7 @@ AI-powered document management system for automatic classification, information 
 
 ## Demo Video
 
-[📹 Watch Demo Video](https://youtu.be/jNIeMRsMjMQ)
+[📹 Watch Demo Video](https://drive.google.com/file/d/1Ko5gan1T2FDQWHv0KzxMLIVpkoFoIC3e/view?usp=drive_link)
 
 ## Features
 
